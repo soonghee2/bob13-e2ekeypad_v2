@@ -1,0 +1,109 @@
+.table-style {
+    width: 100%;
+    table-layout: fixed;
+    background-color: #0071AE28;
+}
+
+.td-style {
+    margin: 0;
+    padding: 0;
+}
+
+.button-style {
+    width: 100%;
+    appearance: none;
+    border-radius: 0;
+    position: relative;
+    height: 63px;
+    margin: 0;
+    padding: 5px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    background: #15b8f026;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+.number-style {
+    background-repeat: no-repeat;
+    position: absolute;
+    height: 50px;
+    width: 50px;
+    margin-left: -25px;
+    top: 5px;
+}
+
+.input-group-style {
+    padding: 50px;
+    text-align: center;
+}
+
+.input-char-style {
+    display: inline-block;
+    width: 23px;
+    height: 23px;
+    background-color: #e5e5e5;
+    border-radius: 50%;
+    margin: 8px;
+}
+
+.input-char-style.active {
+    background-color: #4eaeef;
+}
+
+/* SecureKeypad 컨테이너 */
+.secure-keypad-container {
+    position: relative;
+    width: 50%;
+    height: 100%;
+    margin: 10px;
+}
+
+/* 키패드 이미지 */
+.secure-keypad-image {
+    width: 100%;
+    height: auto;
+}
+
+/* 버튼 그리드 컨테이너 */
+.secure-keypad-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);  /* 4개의 열 */
+    grid-template-rows: repeat(3, 1fr);     /* 3개의 행 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* 개별 버튼 스타일 */
+.secure-keypad-button {
+    border: none;
+    background-color: rgba(0, 0, 0, 0);  /* 버튼의 배경색 */
+    width: 100%;                          /* 버튼의 너비 */
+    height: 100%;                         /* 버튼의 높이 */
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* keypad.css */
+
+.circle-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    margin: 10px 0;
+    width: 50%;
+}
+
+.circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: grey; /* 기본 색상 */
+}
