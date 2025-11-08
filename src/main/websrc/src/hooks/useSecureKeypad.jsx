@@ -6,7 +6,9 @@ export default function useSecureKeypad() {
     const [clickedHashes, setClickedHashes] = useState('');
     const [clickCount, setClickCount] = useState(0);
     const [circleColors, setCircleColors] = useState(Array(6).fill('grey')); // 초기 색상은 회색
-
+    const [publicKey, setPublicKey] = useState('');
+    
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchImageAndKeys = async () => {
@@ -30,12 +32,30 @@ export default function useSecureKeypad() {
         fetchImageAndKeys();
     }, []);
 
-    const submitData = async (newHashes, uuid, hashedTimestamp) => {
+    useEffect(() => {
+        const fetchPublicKey = async () => {
+            try {
+                const response = await fetch('/public.pem');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch public key');
+                }
+                const keyText = await response.text();
+                setPublicKey(keyText);
+            } catch (error) {
+                console.error('Failed to load public key:', error);
+            }
+        };
+
+        fetchPublicKey();
+    }, []);
+
+    const submitData = useCallback(async (newHashes, uuid, hashedTimestamp) => {
         console.log('Submit data function called');
+        setIsLoading(true);  
         try {
-            const publicKey = `-----BEGIN PUBLIC KEY-----
-        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtkLA7dcyLqz4M6BS/XZiwMee85fjwskmxfZVN/qI854Sa4mlU/5Rse0HcNY0QoF+J3kQF3xWpTKLfw2p5pztsALLN6gsO2m4qLIOk3eNR+hVL2Rh4dc8MAhuXfoTGrfMjXouiy05rYgVpqIRRCjzMVGYnJ7arZ6rMN73nRxd0I9RVbe3LXEuHrBysxjfXae6z+qb+1Rp9MKnwiDuKC/i2lqqqmV9p/8OuY+qUzsMCtU8URS8kvw/bkg90TEOHzjKWrRIYRcQQkdJ8KuX3/lV1jBBgIQRfmQVTFUnkV5XBZw9jXYTsz6Bcp4MNWUlwHQIebAM8vMZ6/nH9p4OdETA5wIDAQAB
-        -----END PUBLIC KEY-----`;
+            if (!publicKey) {
+                throw new Error('Public key is not loaded yet');
+            }
 
             const encryptedHashes = encryptWithPublicKey(publicKey, newHashes);
             console.log('Hashes:', newHashes);
@@ -61,14 +81,17 @@ export default function useSecureKeypad() {
             }
             const responseText = await response.text();
             alert(responseText);
+            return responseText;
 
             //const result = await response.json();
             // Optionally, handle success response here
         } catch (error) {
             console.error('Error submitting data:', error);
-            // Optionally, handle error here
+            throw error;
+        } finally {
+            setIsLoading(false);    // ====== 로딩 END
         }
-    };
+    }, [publicKey]);
 
     const handleButtonClick = useCallback((index) => {
         const key = states.keys[index] || '';
@@ -88,13 +111,20 @@ export default function useSecureKeypad() {
             if (newHashes.length === 240) {
                 //alert(`Concatenated hash: ${newHashes}`);
                 // backend로 newHashes, uuid, hashedTimeStamp 보내기
-                submitData(newHashes, states.uuid, states.hashedTimestamp);
-                //window.location.reload();
-                return 0;
+                submitData(newHashes, states.uuid, states.hashedTimestamp)
+                    .then(() => {
+                        window.location.reload()
+                    })
+                    .catch((error) => {
+                        console.error('Submit error received, reloading anyway:', error);
+
+                        window.location.reload(true);
+                    });
+                return '';
             }
             return newHashes;
         });
-    }, [states.keys]);
+    }, [states.keys, submitData]);
 
-    return { states, handleButtonClick ,  circleColors};
+    return { states, handleButtonClick ,  circleColors, isLoading};
 }

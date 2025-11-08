@@ -1,4 +1,5 @@
 //app/page.jsx
+//Next.js에서는 src/app/page.jsx가 라우트 엔트리로 규정됨. 
 "use client";
 
 import React from 'react';
@@ -7,12 +8,18 @@ import SecureKeypad from "../components/SecureKeypad";
 import KeypadUserInput from "../components/KeypadUserInput.jsx";
 
 export default function Page() {
-    const { states, handleButtonClick, circleColors } = useSecureKeypad();
+    const { states, handleButtonClick, circleColors , isLoading} = useSecureKeypad();
 
     if (states.keypad === null) {
         return (
             <div>
                 ...isLoading...
+            </div>
+        );
+    } else if (isLoading){
+        return (
+            <div>
+                서버에게 보내는 중
             </div>
         );
     } else {

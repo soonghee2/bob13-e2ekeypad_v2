@@ -90,7 +90,7 @@ class TestController {
             println("Forwarding Body: $body")
 
             val response = restTemplate.exchange(
-                "http://146.56.119.112:8081/auth",
+                "http://localhost:8081/auth",
                 HttpMethod.POST,
                 entity,
                 String::class.java
