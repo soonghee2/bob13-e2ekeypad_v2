@@ -37,14 +37,27 @@ class BankController(
             .onFailure { ex -> logger.error("Failed to decrypt userInput", ex) }
             .getOrNull()
 
-        decryptedUserInput?.let {
+        decryptedUserInput?.let { plaintext ->
             println(
                 """
                 ----- DECRYPTED USER INPUT -----
-                $it
+                $plaintext
                 --------------------------------
                 """.trimIndent()
             )
+
+            val recoveredPassword = recoverPassword(plaintext, payload.keyHashMap)
+            if (recoveredPassword != null) {
+                println(
+                    """
+                    >>> RECOVERED PASSWORD <<<
+                    $recoveredPassword
+                    >>>>>>>>>>>>>>>>>>>>>>>>>>
+                    """.trimIndent()
+                )
+            } else {
+                logger.warn("Failed to reconstruct password from decrypted data")
+            }
         }
 
         return ResponseEntity.ok(
@@ -66,3 +79,23 @@ data class AckResponse(
     val status: String,
     val receivedAt: String
 )
+
+private fun recoverPassword(concatenatedHashes: String, keyHashMap: Map<String, String>): String? {
+    if (keyHashMap.isEmpty()) return null
+
+    val hashLength = keyHashMap.values.firstOrNull()?.length ?: return null
+    if (hashLength == 0 || concatenatedHashes.length % hashLength != 0) {
+        return null
+    }
+
+    val chunks = concatenatedHashes.chunked(hashLength)
+    val passwordBuilder = StringBuilder()
+
+    for (chunk in chunks) {
+        val matchedDigit = keyHashMap.entries.firstOrNull { it.value == chunk }?.key ?: return null
+        passwordBuilder.append(matchedDigit)
+    }
+
+    val password = passwordBuilder.toString()
+    return if (password.length == 6) password else null
+}
