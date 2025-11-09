@@ -1,4 +1,5 @@
 //layout.js
+import './globals.css';
 
 export const metadata = {
   title: "Secure Keypad",
@@ -7,8 +8,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-      <html lang="en">
+    <html lang="ko">
       <body>{children}</body>
-      </html>
+    </html>
   );
 }

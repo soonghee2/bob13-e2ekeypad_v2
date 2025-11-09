@@ -1,0 +1,10 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: bank-server
+
+logging:
+  level:
+    org.example.bank: INFO

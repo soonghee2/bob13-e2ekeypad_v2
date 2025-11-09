@@ -52,29 +52,40 @@
 }
 
 /* SecureKeypad 컨테이너 */
+:root {
+    --secure-keypad-columns: 3;
+    --secure-keypad-rows: 4;
+}
+
 .secure-keypad-container {
     position: relative;
-    width: 50%;
-    height: 100%;
-    margin: 10px;
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 3 / 4;
+    margin: 0 auto;
+    overflow: hidden;
 }
 
 /* 키패드 이미지 */
 .secure-keypad-image {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1.5rem;
+    pointer-events: none;
+    user-select: none;
 }
 
 /* 버튼 그리드 컨테이너 */
 .secure-keypad-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);  /* 4개의 열 */
-    grid-template-rows: repeat(3, 1fr);     /* 3개의 행 */
+    grid-template-columns: repeat(var(--secure-keypad-columns), 1fr);
+    grid-template-rows: repeat(var(--secure-keypad-rows), 1fr);
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
+    z-index: 10;
 }
 
 /* 개별 버튼 스타일 */
@@ -89,6 +100,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: manipulation;
+}
+
+.secure-keypad-button:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: -4px;
+    border-radius: 1.5rem;
+}
+
+.secure-keypad-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
 }
 
 /* keypad.css */

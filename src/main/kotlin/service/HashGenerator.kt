@@ -19,16 +19,19 @@
 
 package org.example.service
 
-import java.security.MessageDigest
-import kotlin.random.Random
+import org.springframework.stereotype.Component
+import java.security.SecureRandom
 
+@Component
 class HashGenerator {
+    private val secureRandom = SecureRandom()
+
     fun getHashes(): Map<String, String> {
         val hashes = mutableMapOf<String, String>()
 
         for (i in 0..9) {
             val key = i.toString()
-            val randomBytes = Random.nextBytes(20) // 20 바이트의 랜덤 데이터 생성 (160비트)
+            val randomBytes = ByteArray(20).also(secureRandom::nextBytes) // 160-bit random chunk
             val hash = randomBytes.toHexString()
             hashes[key] = hash
         }
@@ -36,7 +39,6 @@ class HashGenerator {
         return hashes
     }
 
-    // 바이트 배열을 16진수 문자열로 변환하는 확장 함수
     private fun ByteArray.toHexString(): String {
         return joinToString("") { "%02x".format(it) }
     }
