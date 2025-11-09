@@ -1,0 +1,15 @@
+.gradle
+build
+*/build
+out
+*.iml
+.idea
+.vscode
+.git
+**/.DS_Store
+src/main/websrc/.next
+src/main/websrc/node_modules
+node_modules
+.next
+dist
+tmp
