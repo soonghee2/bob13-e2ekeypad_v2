@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.backend
-    image: ${DOCKER_BACKEND_IMAGE:-e2ekeypad-backend:latest}
+    image: ${DOCKER_BACKEND_IMAGE:-songhee2/e2e-keypad-project:backend-v1}
     environment:
       SERVER_PORT: ${BACKEND_PORT:-8080}
       BANK_SERVER_URL: ${BANK_SERVER_URL:-http://bank:8081}
@@ -18,7 +18,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.bank
-    image: ${DOCKER_BANK_IMAGE:-e2ekeypad-bank:latest}
+    image: ${DOCKER_BANK_IMAGE:-songhee2/e2e-keypad-project:bank-v1}
     environment:
       BANK_SERVER_PORT: ${BANK_PORT:-8081}
     ports:
@@ -32,7 +32,7 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://backend:8080}
-    image: ${DOCKER_FRONTEND_IMAGE:-e2ekeypad-frontend:latest}
+    image: ${DOCKER_FRONTEND_IMAGE:-songhee2/e2e-keypad-project:frontend-v1}
     environment:
       PORT: ${FRONTEND_PORT:-3000}
       NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://backend:8080}
