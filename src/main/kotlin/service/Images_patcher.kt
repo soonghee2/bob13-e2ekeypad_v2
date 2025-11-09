@@ -8,7 +8,12 @@ import java.io.InputStream
 import java.util.Base64
 import javax.imageio.ImageIO
 
-class Images_patcher (private val shuffledItems: List<Any>) {
+class Images_patcher(private val shuffledItems: List<Any>) {
+
+    companion object {
+        private const val GRID_COLUMNS = 3
+        private const val GRID_ROWS = 4
+    }
 
     fun combineImages(): String {
         // 이미지 파일 경로 설정
@@ -23,12 +28,8 @@ class Images_patcher (private val shuffledItems: List<Any>) {
         // 이미지 로딩
         val images = imagePaths.map { path -> loadImageFromClasspath(path) }
 
-        // 그리드 크기 및 개수 설정
-        val columns = 4
-        val rows = 3
-
         // 이미지 결합
-        val combinedImage = combineImagesInGrid(images, columns, rows)
+        val combinedImage = combineImagesInGrid(images, GRID_COLUMNS, GRID_ROWS)
 
         // 이미지 인코딩
         return encodeImageToBase64(combinedImage)

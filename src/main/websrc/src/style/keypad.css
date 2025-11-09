@@ -52,6 +52,11 @@
 }
 
 /* SecureKeypad 컨테이너 */
+:root {
+    --secure-keypad-columns: 3;
+    --secure-keypad-rows: 4;
+}
+
 .secure-keypad-container {
     position: relative;
     width: 50%;
@@ -68,8 +73,8 @@
 /* 버튼 그리드 컨테이너 */
 .secure-keypad-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);  /* 4개의 열 */
-    grid-template-rows: repeat(3, 1fr);     /* 3개의 행 */
+    grid-template-columns: repeat(var(--secure-keypad-columns), 1fr);  /* 4개의 열 */
+    grid-template-rows: repeat(var(--secure-keypad-rows), 1fr);     /* 3개의 행 */
     position: absolute;
     top: 0;
     left: 0;
