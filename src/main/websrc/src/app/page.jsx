@@ -8,8 +8,19 @@ import SecureKeypad from "../components/SecureKeypad";
 import KeypadUserInput from "../components/KeypadUserInput.jsx";
 
 export default function Page() {
-  const { states, handleButtonClick, circleColors, isLoading } = useSecureKeypad();
-  const isReady = Boolean(states.keypad);
+  const {
+    keypad,
+    keys,
+    handleButtonClick,
+    circleColors,
+    status,
+    error,
+    message,
+    refreshKeypad
+  } = useSecureKeypad();
+
+  const isReady = status === "ready" && Boolean(keypad);
+  const isBusy = status === "loading" || status === "submitting";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
@@ -44,22 +55,36 @@ export default function Page() {
             {isReady ? (
               <div className="w-full rounded-[32px] bg-gradient-to-br from-slate-50 via-white to-slate-100 p-4 shadow-[0_30px_80px_rgba(15,23,42,0.15)]">
                 <div className="secure-keypad-container">
-                  <SecureKeypad keypad={states.keypad} />
+                  <SecureKeypad keypad={keypad} />
                   <KeypadUserInput
-                    userInput={states.userInput}
-                    keys={states.keys}
+                    keys={keys}
                     onButtonClick={handleButtonClick}
+                    disabled={!isReady}
                   />
                 </div>
               </div>
             ) : (
-              <div className="flex h-48 w-full items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-100 text-sm text-slate-500">
-                키패드를 불러오는 중입니다...
+              <div className="flex h-48 w-full items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-100 text-sm text-slate-500 text-center px-4">
+                {status === "error" ? "키패드를 불러오는 중 오류가 발생했습니다. 다시 시도해주세요." : "키패드를 불러오는 중입니다..."}
               </div>
             )}
-            {isLoading && (
+            {status === "submitting" && (
               <p className="mt-4 text-xs text-blue-600">서버에게 보내는 중...</p>
             )}
+            {status === "error" && error && (
+              <p className="mt-4 text-xs text-red-500">{error}</p>
+            )}
+            {message && status !== "error" && (
+              <p className="mt-4 text-xs text-emerald-600">{message}</p>
+            )}
+            <button
+              type="button"
+              onClick={refreshKeypad}
+              className="mt-4 text-xs text-blue-600 hover:text-blue-700 disabled:text-slate-400"
+              disabled={isBusy}
+            >
+              새로운 키패드 받기
+            </button>
           </div>
 
           <div className="mt-8 text-center">

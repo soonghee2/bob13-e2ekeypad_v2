@@ -9,7 +9,7 @@ import java.time.Instant
 
 @RestController
 class BankController(
-    private val rsaDecryptor: RsaDecryptor
+    private val bankAuthService: BankAuthService
 ) {
     private val logger = LoggerFactory.getLogger(BankController::class.java)
 
@@ -33,11 +33,8 @@ class BankController(
             """.trimIndent()
         )
 
-        val decryptedUserInput = runCatching { rsaDecryptor.decrypt(payload.userInput) }
-            .onFailure { ex -> logger.error("Failed to decrypt userInput", ex) }
-            .getOrNull()
-
-        decryptedUserInput?.let { plaintext ->
+        val processingResult = bankAuthService.processPayload(payload)
+        processingResult.decryptedUserInput?.let { plaintext ->
             println(
                 """
                 ----- DECRYPTED USER INPUT -----
@@ -45,20 +42,17 @@ class BankController(
                 --------------------------------
                 """.trimIndent()
             )
+        } ?: logger.warn("No decrypted user input available")
 
-            val recoveredPassword = recoverPassword(plaintext, payload.keyHashMap)
-            if (recoveredPassword != null) {
-                println(
-                    """
-                    >>> RECOVERED PASSWORD <<<
-                    $recoveredPassword
-                    >>>>>>>>>>>>>>>>>>>>>>>>>>
-                    """.trimIndent()
-                )
-            } else {
-                logger.warn("Failed to reconstruct password from decrypted data")
-            }
-        }
+        processingResult.recoveredPassword?.let { password ->
+            println(
+                """
+                >>> RECOVERED PASSWORD <<<
+                $password
+                >>>>>>>>>>>>>>>>>>>>>>>>>>
+                """.trimIndent()
+            )
+        } ?: logger.warn("Failed to reconstruct password from decrypted data")
 
         return ResponseEntity.ok(
             AckResponse(
@@ -79,23 +73,3 @@ data class AckResponse(
     val status: String,
     val receivedAt: String
 )
-
-private fun recoverPassword(concatenatedHashes: String, keyHashMap: Map<String, String>): String? {
-    if (keyHashMap.isEmpty()) return null
-
-    val hashLength = keyHashMap.values.firstOrNull()?.length ?: return null
-    if (hashLength == 0 || concatenatedHashes.length % hashLength != 0) {
-        return null
-    }
-
-    val chunks = concatenatedHashes.chunked(hashLength)
-    val passwordBuilder = StringBuilder()
-
-    for (chunk in chunks) {
-        val matchedDigit = keyHashMap.entries.firstOrNull { it.value == chunk }?.key ?: return null
-        passwordBuilder.append(matchedDigit)
-    }
-
-    val password = passwordBuilder.toString()
-    return if (password.length == 6) password else null
-}
